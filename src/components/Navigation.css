@@ -1,0 +1,51 @@
+.nav-bar {
+    top: 0;
+    background: gray;
+    position: fixed;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    color: white;
+    padding: 20px;
+    font-weight: 600;
+    font-size: 20px;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    z-index: 10;
+}
+
+.nav-bar .left,
+.nav-bar .center,
+.nav-bar .right {
+    display: flex;
+    align-items: center;
+}
+
+.nav-bar .left {
+    flex: 1;
+}
+
+.nav-bar .center {
+    flex: 1;
+    justify-content: center;
+}
+
+.nav-bar .right {
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.nav-bar a {
+    padding: 0 20px;
+    text-decoration: none;
+    color: white;
+}
+
+.nav-bar a:hover {
+    color: black;
+}
+
+.nav-bar .right {
+    margin-right: 35px; 
+}

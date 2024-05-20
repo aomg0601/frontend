@@ -2,16 +2,35 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import Navigation from './components/Navigation';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+// AppWithNavigation 
+const AppWithNavigation = () => {
+  return (
+    <BrowserRouter>
+      <NavigationWrapper />
+    </BrowserRouter>
+  );
+}
+
+// NavigationWrapper 정의
+const NavigationWrapper = () => {
+  const location = useLocation();  // 현재 url
+
+  return (
+    <>
+      {/*login페이지 빼고 Navigation 표시 */}
+      {location.pathname !== "/" && <Navigation />}
+      <App />
+    </>
+  );
+}
+// ReactDOM.createRoot 로 AppWithNavigation 렌더링
 root.render(
   <React.StrictMode>
-    <App />
+    <AppWithNavigation />
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
