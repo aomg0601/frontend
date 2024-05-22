@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {Route, Routes, BrowserRouter} from "react-router-dom";
+// import {Route, Routes, BrowserRouter} from "react-router-dom";
 import Avatar from '@mui/material/Avatar';
 // import "./MyPortPop.css";
-import CssBaseline from '@mui/material/CssBaseline';
+// import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
@@ -15,7 +15,7 @@ import Checkbox from '@mui/material/Checkbox';
 import { Typography } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate,useLocation } from 'react-router-dom';
-import App from '../App';
+// import App from '../App';
 
 // 다미 데이터
 const User = {
