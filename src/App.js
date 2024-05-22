@@ -50,6 +50,7 @@ import OurForm from "./routes/OurForm";
 import Login from "./routes/Login";
 import CreateQuestion from "./ai/CreateQuestion";
 import CreatePPT from "./ai/CreatePPT";
+import ViewCard from './components/ViewCard';
 
 function App() {
   const [cards, setCards] = useState([]);
@@ -62,6 +63,9 @@ function App() {
     setCards(prevCards => prevCards.map(card => card.id === updatedCard.id ? updatedCard : card));
   };
 
+  const deleteCard = (id) => {
+    setCards((prevCards) => prevCards.filter((card) => card.id !== id));
+  };
   return (
     <Routes>
       <Route path="/" element={<Login />} />
@@ -69,11 +73,10 @@ function App() {
       <Route path="/ourform" element={<OurForm addCard={addCard} updateCard={updateCard} />} />
       <Route path="/createquestion" element={<CreateQuestion />} />
       <Route path="/createppt" element={<CreatePPT />} />
+      <Route path="/viewcard" element={<ViewCard updateCard={updateCard} deleteCard={deleteCard} />} />
     </Routes>
 
   );
 }
 
 export default App;
-
-[

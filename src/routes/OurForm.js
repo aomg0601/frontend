@@ -1,5 +1,6 @@
+// src/components/OurForm.js
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AceEditor from 'react-ace';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -11,6 +12,7 @@ import 'ace-builds/src-noconflict/worker-javascript';
 import Popup from '../components/Popup';
 
 function OurForm({ addCard, updateCard }) {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     title: '',
     durationStart: null,
@@ -22,8 +24,8 @@ function OurForm({ addCard, updateCard }) {
     id: null,
   });
 
-  const navigate = useNavigate();
   const [textAreas, setTextAreas] = useState([]);
+  const navigate = useNavigate();
   const [isFormValid, setIsFormValid] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -38,6 +40,14 @@ function OurForm({ addCard, updateCard }) {
     technology: useRef(null),
     summary: useRef(null),
   };
+
+  useEffect(() => {
+    if (location.state) {
+      const { formData, textAreas } = location.state;
+      setFormData(formData);
+      setTextAreas(textAreas || []);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     Object.values(refs).forEach((ref) => {
@@ -70,6 +80,7 @@ function OurForm({ addCard, updateCard }) {
     const newCard = {
       ...formData,
       savedDate,
+      textAreas, // 수정 부분 
       id: formData.id !== null ? formData.id : Date.now(),
     };
 
@@ -432,8 +443,13 @@ export default OurForm;
 
 
 
+
+
+
+
+// // src/components/OurForm.js
 // import React, { useState, useEffect, useRef } from 'react';
-// import { useNavigate } from 'react-router-dom';
+// import { useNavigate, useLocation } from 'react-router-dom';
 // import AceEditor from 'react-ace';
 // import DatePicker from 'react-datepicker';
 // import 'react-datepicker/dist/react-datepicker.css';
@@ -444,8 +460,8 @@ export default OurForm;
 // import 'ace-builds/src-noconflict/worker-javascript';
 // import Popup from '../components/Popup';
 
-
 // function OurForm({ addCard, updateCard }) {
+//   const location = useLocation();
 //   const [formData, setFormData] = useState({
 //     title: '',
 //     durationStart: null,
@@ -457,8 +473,8 @@ export default OurForm;
 //     id: null,
 //   });
 
-//   const navigate = useNavigate();
 //   const [textAreas, setTextAreas] = useState([]);
+//   const navigate = useNavigate();
 //   const [isFormValid, setIsFormValid] = useState(false);
 //   const [isSaved, setIsSaved] = useState(false);
 //   const [showPopup, setShowPopup] = useState(false);
@@ -473,6 +489,14 @@ export default OurForm;
 //     technology: useRef(null),
 //     summary: useRef(null),
 //   };
+
+//   useEffect(() => {
+//     if (location.state) {
+//       const { formData, textAreas } = location.state;
+//       setFormData(formData);
+//       setTextAreas(textAreas || []);
+//     }
+//   }, [location.state]);
 
 //   useEffect(() => {
 //     Object.values(refs).forEach((ref) => {
@@ -536,7 +560,7 @@ export default OurForm;
 //     if (selectedOption === 'AI') {
 //       navigate('/createquestion');
 //     } else if (selectedOption === 'PPT') {
-//       navigate('/ai/createppt', { state: { formData, textAreas } });
+//       navigate('/createppt', { state: { formData, textAreas } });
 //     }
 //   };
 
@@ -863,4 +887,6 @@ export default OurForm;
 // }
 
 // export default OurForm;
+
+
 
