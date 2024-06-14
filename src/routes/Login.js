@@ -1,176 +1,409 @@
 import React, { useState, useEffect } from 'react';
-// import {Route, Routes, BrowserRouter} from "react-router-dom";
+import { login, reissueToken } from '../api/Api'; 
 import Avatar from '@mui/material/Avatar';
-// import "./MyPortPop.css";
-// import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Checkbox from '@mui/material/Checkbox';
 import { Typography } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useNavigate,useLocation } from 'react-router-dom';
-// import App from '../App';
-
-// 다미 데이터
-const User = {
-  id: 'caucap1111',
-  pw: 'caucap1111'
-}
+import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
 const Login = () => {
-  const [id, setId ] = useState('');
-  const [pw, setPw] = useState('');
-
-  const [idValid, setIdValid ] = useState(false);
-  const [pwValid, setPwValid] = useState(false);
-
-  const [notAllow, setNotAllow] = useState(true);
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
 
-
-
-// id 확인
-  const handleId = (e) => {
-      setId(e.target.value);
-      const regex =  /(?=.*\d)(?=.*[a-z]).{6,}/;
-      if (regex.test(id)) {
-        setIdValid(true) ;
-      } else{
-        setIdValid(false);
-      }
-  }
-  // 비번
-  const handlePassword = (e) => {
-      setPw(e.target.value);
-      const regex =  /(?=.*\d)(?=.*[a-z]).{8,}/;
-      if (regex.test(pw)) {
-        setPwValid(true) ;
-      } else{
-        setPwValid(false);
-      }
-
-  }
-  // 로그인버튼 활성화 여부 체크
   useEffect(() => {
-    // id, 비번 두개 다 true면 버튼 활성화
-      if(idValid && pwValid) {
-        setNotAllow(false);
-        return;
-      }
-      setNotAllow(true);
-  }, [idValid, pwValid]);
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isPasswordValid = password.trim().length >= 6;
 
-  // 로그인 버튼 동작
-  const onClickConfirmButton = () => {
-    if (id === User.id && pw === User.pw ){
-      // alert('로그인에 성공하였습니다 ');
-      setIsLoggedIn(true);
-      loginSuccess();
-    } else {
-      alert('등록되지 않은 회원입니다 ');
+    setIsFormValid(
+      isEmailValid &&
+      isPasswordValid
+    );
+  }, [email, password]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isFormValid) {
+      alert('양식을 올바르게 작성해주세요');
+      return;
     }
-  }
-
-    const loginSuccess = () => {
-         navigate("/MyPort");
+    try {
+      const { accessToken, refreshToken } = await login({ email, password });
+      console.log('Login successful:', { accessToken, refreshToken });
+      alert('로그인 성공');
+      navigate('/myport'); 
+    } catch (error) {
+      console.error('Error logging in:', error);
+      alert('로그인 중 오류가 발생했습니다');
     }
+  };
 
-
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-  //   const data = new FormData(event.currentTarget);
-  //   console.log({
-  //     id: data.get('id'),
-  //     password: data.get('password'),
-  //   });
-  // };
   return (
     <ThemeProvider theme={defaultTheme}>
-        <Container component="main" maxWidth="xs">
-      <Box
+      <Container component="main" maxWidth="xs">
+        <Box
           sx={{
             marginTop: 8,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
           }}
-      >
-      <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-      <LockOutlinedIcon/>
-      </Avatar>
-      {/* 내용은 h1인데 디자인은 h5 */}
-      <Typography component= "h1" variant='h5'>
-          Sign in
-      </Typography>
-        <TextField
-            margin="normal"
-            type = "text"
-            label = "아이디" 
-            required // 반드시 입력 
-            fullWidth
-            name = "id"
-            autoFocus
-            value={id}
-            onChange={handleId}
-        />
-        <div className='errorMessageWrap'>
-          {!idValid && id.length >0 &&(
-            <div>올바른 아이디를 입력해주세요</div>
-          )}
-
-        </div>
-
-        <TextField
-            margin="normal"
-            label = "비밀번호"
-            type = "password" 
-            required
-            fullWidth
-            name='password'
-            autoComplete='current-password'
-            value={pw}
-            onChange={handlePassword}
-        />
-        <div className='errorMessageWrap'>
-          {!pwValid && pw.length >0 &&(
-            <div>올바른 비밀번호를 입력해주세요</div>
-          )}
-
-        </div>
-        <FormControlLabel control={<Checkbox value="remember" color='primary' />}
-            label="Remember me"
-     
-        />
-
-        <Button onClick={onClickConfirmButton} disabled = {notAllow} 
-            type = "submit" fullWidth variant = "contained" 
-        sx = {{ mt: 3, mb:2}}>
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
             로그인
-        </Button>
-
-        <Grid container>
-          <Grid item xs>
-              <Link>Forget password?</Link>
-          </Grid>
-          <Grid item>
-              <Link>Sign up</Link>
-          </Grid>
-        </Grid>
-      </Box>
-    </Container>
-
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="메일"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="비밀번호"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={!isFormValid}
+            >
+              로그인
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link href="/signup" variant="body2">
+                  회원가입 화면
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+      </Container>
     </ThemeProvider>
   );
 };
 
 export default Login;
+
+
+
+
+
+
+
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { login } from '../api/Api';
+// import Avatar from '@mui/material/Avatar';
+// import TextField from '@mui/material/TextField';
+// import Button from '@mui/material/Button';
+// import Link from '@mui/material/Link';
+// import Grid from '@mui/material/Grid';
+// import Box from '@mui/material/Box';
+// import Container from '@mui/material/Container';
+// import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+// import { Typography } from '@mui/material';
+// import { createTheme, ThemeProvider } from '@mui/material/styles';
+// import { useNavigate } from 'react-router-dom';
+
+// const defaultTheme = createTheme();
+
+// const Login = () => {
+//   const [email, setEmail] = useState('');
+//   const [password, setPassword] = useState('');
+//   const [isFormValid, setIsFormValid] = useState(false);
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+//     const isPasswordValid = password.trim().length >= 6;
+
+//     setIsFormValid(isEmailValid && isPasswordValid);
+//   }, [email, password]);
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     if (!isFormValid) {
+//       alert('Please fill out the form correctly');
+//       return;
+//     }
+//     try {
+//       const response = await login({ email, password });
+//       localStorage.setItem('token', response.token);
+//       console.log('Login successful:', response);
+//       alert('로그인 성공');
+//       navigate('/myport');
+//     } catch (error) {
+//       console.error('Error logging in:', error.response?.data || error.message);
+//       alert('로그인 중 오류가 발생했습니다');
+//     }
+//   };
+
+//   return (
+//     <ThemeProvider theme={defaultTheme}>
+//       <Container component="main" maxWidth="xs">
+//         <Box
+//           sx={{
+//             marginTop: 8,
+//             display: 'flex',
+//             flexDirection: 'column',
+//             alignItems: 'center',
+//           }}
+//         >
+//           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+//             <LockOutlinedIcon />
+//           </Avatar>
+//           <Typography component="h1" variant="h5">
+//             Login
+//           </Typography>
+//           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+//             <TextField
+//               margin="normal"
+//               required
+//               fullWidth
+//               id="email"
+//               label="메일"
+//               name="email"
+//               autoComplete="email"
+//               autoFocus
+//               value={email}
+//               onChange={(e) => setEmail(e.target.value)}
+//             />
+//             <TextField
+//               margin="normal"
+//               required
+//               fullWidth
+//               name="password"
+//               label="비밀번호"
+//               type="password"
+//               id="password"
+//               autoComplete="current-password"
+//               value={password}
+//               onChange={(e) => setPassword(e.target.value)}
+//             />
+//             <Button
+//               type="submit"
+//               fullWidth
+//               variant="contained"
+//               sx={{ mt: 3, mb: 2 }}
+//               disabled={!isFormValid}
+//             >
+//               로그인
+//             </Button>
+//             <Grid container justifyContent="flex-end">
+//               <Grid item>
+//                 <Link href="/signup" variant="body2">
+//                   회원가입 화면
+//                 </Link>
+//               </Grid>
+//             </Grid>
+//           </Box>
+//         </Box>
+//       </Container>
+//     </ThemeProvider>
+//   );
+// };
+
+// export default Login;
+
+
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { login } from '../api/Api'; 
+// import Avatar from '@mui/material/Avatar';
+// import TextField from '@mui/material/TextField';
+// import Button from '@mui/material/Button';
+// import Link from '@mui/material/Link';
+// import Grid from '@mui/material/Grid';
+// import Box from '@mui/material/Box';
+// import Container from '@mui/material/Container';
+// import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+// import { Typography } from '@mui/material';
+// import { createTheme, ThemeProvider } from '@mui/material/styles';
+// import { useNavigate } from 'react-router-dom';
+
+// const defaultTheme = createTheme();
+
+// const Login = () => {
+//   const [email, setEmail] = useState('');
+//   const [password, setPassword] = useState('');
+//   const [emailValid, setEmailValid] = useState(false);
+//   const [passwordValid, setPasswordValid] = useState(false);
+//   const [notAllow, setNotAllow] = useState(true);
+//   const [isLoggedIn, setIsLoggedIn] = useState(false);
+//   const navigate = useNavigate();
+
+//   const handleEmail = (e) => {
+//     setEmail(e.target.value);
+//     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (regex.test(e.target.value)) {
+//       setEmailValid(true);
+//     } else {
+//       setEmailValid(false);
+//     }
+//   };
+
+//   const handlePassword = (e) => {
+//     setPassword(e.target.value);
+//     const regex = /[a-zA-Z0-9!@#$%^&*]/;
+//     if (regex.test(e.target.value)) {
+//       setPasswordValid(true);
+//     } else {
+//       setPasswordValid(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (emailValid && passwordValid) {
+//       setNotAllow(false);
+//     } else {
+//       setNotAllow(true);
+//     }
+//   }, [emailValid, passwordValid]);
+
+//   const onClickConfirmButton = async () => {
+//     try {
+//       console.log('Attempting to log in with:', { email, password });
+//       const response = await login({ email, password });
+//       console.log('Login response:', response);
+      
+//       if (response.status === 200) {
+//         const token = response.data; // 응답 데이터에서 토큰 추출
+//         console.log('Token received:', token);
+//         localStorage.setItem('token', token);
+//         const storedToken = localStorage.getItem('token');
+//         console.log('Retrieved token from localStorage:', storedToken);
+//         loginSuccess();
+//       } else {
+//         console.error('Login failed with status:', response.status);
+//         alert('로그인에 실패했습니다。Status code: ' + response.status);
+//       }
+//     } catch (error) {
+//       console.error('Error logging in:', error);
+//       if (error.response) {
+//         alert('등록안됨。Status code: ' + error.response.status);
+//       } else if (error.request) {
+//         alert('서버에서 응답없음');
+//       } else {
+//         alert('error: ' + error.message);
+//       }
+//     }
+//   };
+
+//   const loginSuccess = () => {
+//     console.log('Login successful, navigating to MyPort');
+//     setIsLoggedIn(true);
+//     navigate('/MyPort');
+//   };
+
+//   return (
+//     <ThemeProvider theme={defaultTheme}>
+//       <Container component="main" maxWidth="xs">
+//         <Box
+//           sx={{
+//             marginTop: 8,
+//             display: 'flex',
+//             flexDirection: 'column',
+//             alignItems: 'center',
+//           }}
+//         >
+//           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+//             <LockOutlinedIcon />
+//           </Avatar>
+//           <Typography component="h1" variant="h5">
+//             Sign in
+//           </Typography>
+//           <TextField
+//             margin="normal"
+//             type="email"
+//             label="메일"
+//             required
+//             fullWidth
+//             name="email"
+//             autoFocus
+//             value={email}
+//             onChange={handleEmail}
+//           />
+//           <div className='errorMessageWrap'>
+//             {!emailValid && email.length > 0 && (
+//               <div>올바른 메일을 입력해주세요</div>
+//             )}
+//           </div>
+//           <TextField
+//             margin="normal"
+//             label="비밀번호"
+//             type="password"
+//             required
+//             fullWidth
+//             name="password"
+//             autoComplete="current-password"
+//             value={password}
+//             onChange={handlePassword}
+//           />
+//           <div className='errorMessageWrap'>
+//             {!passwordValid && password.length > 0 && (
+//               <div>올바른 비밀번호를 입력해주세요</div>
+//             )}
+//           </div>
+//           <Button
+//             onClick={onClickConfirmButton}
+//             disabled={notAllow}
+//             type="submit"
+//             fullWidth
+//             variant="contained"
+//             sx={{ mt: 3, mb: 2 }}
+//           >
+//             로그인
+//           </Button>
+//           <Grid container>
+//             <Grid item xs>
+              
+//             </Grid>
+//             <Grid item>
+//               <Link href="/signup" variant="body2">{"회원가입"}</Link>
+//             </Grid>
+//           </Grid>
+//         </Box>
+//       </Container>
+//     </ThemeProvider>
+//   );
+// };
+
+// export default Login;
+
+
+
+

@@ -9,10 +9,11 @@ function Navigation() {
       <div className="left"><Link to="/myport">logo</Link></div>
       <div className="center">
         <Link to="/myport">my포폴</Link>
+        <Link to="/board" style={{ marginLeft: '20px' }}>Board</Link>
       </div>
-      <div className="right">
+      <Link to = "/signup" className="right">
         로그아웃
-      </div>
+      </Link>
     </div>
   );
 }

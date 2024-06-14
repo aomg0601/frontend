@@ -23,7 +23,7 @@ const NavigationWrapper = () => {
   return (
     <>
       {/*login페이지 빼고 Navigation 표시 */}
-      {location.pathname !== "/" && <Navigation />}
+      {location.pathname !== "/" && location.pathname !== "/signup"&&<Navigation />}
       <App />
     </>
   );
